@@ -1,0 +1,21 @@
+{
+  "name": "b04rdc4mp-v2",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Back-end for B04rdC4mp, a management system for a board game rental company",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
