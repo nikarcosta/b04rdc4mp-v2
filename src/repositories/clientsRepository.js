@@ -11,3 +11,9 @@ export async function postClientsRepository(name, phone, cpf, birthday) {
   );
   return;
 }
+
+export async function getClientsRepository() {
+  return db.query(
+    `SELECT id, name, phone, cpf, CAST(birthday AS DATE) AS birthday FROM customers`
+  );
+}

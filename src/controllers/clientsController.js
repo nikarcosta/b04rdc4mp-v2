@@ -1,6 +1,7 @@
 import {
   postClientsRepository,
   findClientsRepository,
+  getClientsRepository,
 } from "../repositories/clientsRepository.js";
 
 export async function postClients(req, res) {
@@ -14,6 +15,21 @@ export async function postClients(req, res) {
     await postClientsRepository(name, phone, cpf, birthday);
 
     return res.sendStatus(201);
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+}
+
+export async function getClients(_, res) {
+  try {
+    const clients = await getClientsRepository();
+
+    const formattedClients = clients.rows.map((client) => ({
+      ...client,
+      birthday: new Date(client.birthday).toISOString().split("T")[0],
+    }));
+
+    return res.status(200).send(formattedClients);
   } catch (err) {
     return res.status(500).send(err.message);
   }
