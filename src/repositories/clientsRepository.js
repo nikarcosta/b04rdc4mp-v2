@@ -17,3 +17,7 @@ export async function getClientsRepository() {
     `SELECT id, name, phone, cpf, CAST(birthday AS DATE) AS birthday FROM customers`
   );
 }
+
+export async function getClientsByIdRepository(id) {
+  return db.query(`SELECT * FROM customers WHERE id=$1`, [id]);
+}
