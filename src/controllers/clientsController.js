@@ -41,7 +41,7 @@ export async function getClientsById(req, res) {
 
     const formattedClients = formatDate(client.rows);
 
-    return res.status(200).send(formattedClients);
+    return res.status(200).send(formattedClients[0]);
   } catch (err) {
     return res.status(500).send(err.message);
   }
