@@ -3,6 +3,7 @@ import {
   findClientsRepository,
   getClientsRepository,
   getClientsByIdRepository,
+  updateClientsRepository,
 } from "../repositories/clientsRepository.js";
 
 export async function postClients(req, res) {
@@ -42,6 +43,26 @@ export async function getClientsById(req, res) {
     const formattedClients = formatDate(client.rows);
 
     return res.status(200).send(formattedClients[0]);
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+}
+
+export async function updateClients(req, res) {
+  const { id } = req.params;
+  console.log(id);
+  const { name, phone, cpf, birthday } = req.body;
+
+  try {
+    const client = await getClientsByIdRepository(id);
+    if (client.rowCount === 0) return res.status(404).send("Client not found!");
+
+    if (client.rows[0].cpf === cpf) {
+      await updateClientsRepository(name, phone, cpf, birthday, id);
+      return res.sendStatus(200);
+    }
+
+    return res.sendStatus(409);
   } catch (err) {
     return res.status(500).send(err.message);
   }

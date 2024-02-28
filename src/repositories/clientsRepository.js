@@ -13,11 +13,16 @@ export async function postClientsRepository(name, phone, cpf, birthday) {
 }
 
 export async function getClientsRepository() {
-  return db.query(
-    `SELECT id, name, phone, cpf, CAST(birthday AS DATE) AS birthday FROM customers`
-  );
+  return db.query(`SELECT id, name, phone, cpf, birthday FROM customers`);
 }
 
 export async function getClientsByIdRepository(id) {
   return db.query(`SELECT * FROM customers WHERE id=$1`, [id]);
+}
+
+export async function updateClientsRepository(name, phone, cpf, birthday, id) {
+  return db.query(
+    `UPDATE customers SET name = $1, phone = $2, cpf = $3, birthday = $4 WHERE id = $5`,
+    [name, phone, cpf, birthday, id]
+  );
 }
