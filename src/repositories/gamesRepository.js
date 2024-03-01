@@ -20,3 +20,7 @@ export async function postGamesRepository(
   );
   return;
 }
+
+export async function findGamesByIdRepository(id) {
+  return db.query(`SELECT * FROM games WHERE id=$1`, [id]);
+}
