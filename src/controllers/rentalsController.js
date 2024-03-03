@@ -4,6 +4,9 @@ import {
   getRentalsByGameIdRepository,
   getRentalsRepository,
   postRentalsRepository,
+  updateRentalsReturnDateRepository,
+  updateRentalsDelayFeeRepository,
+  getRentalsById,
 } from "../repositories/rentalsRepository.js";
 
 export async function getRentals(_, res) {
@@ -45,6 +48,41 @@ export async function postRentals(req, res) {
     );
 
     return res.sendStatus(201);
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+}
+
+export async function updateRentals(req, res) {
+  const { id } = req.params;
+
+  try {
+    const rentalExist = await getRentalsById(id);
+
+    if (rentalExist.rowCount === 0) return res.sendStatus(404);
+
+    if (rentalExist.rows[0].returnDate != null) return res.sendStatus(400);
+
+    const returnDate = new Date();
+    await updateRentalsReturnDateRepository(returnDate, id);
+
+    const updatedRental = await getRentalsById(id);
+
+    const diffDays = Math.ceil(
+      (new Date(updatedRental.rows[0].returnDate) -
+        new Date(updatedRental.rows[0].rentDate)) /
+        (1000 * 60 * 60 * 24)
+    );
+
+    const daysRented = updatedRental.rows[0].daysRented;
+
+    if (diffDays > daysRented) {
+      let delayFee = (diffDays - daysRented) * originalPrice;
+      await updateRentalsDelayFeeRepository(delayFee, id);
+      return res.sendStatus(200);
+    }
+
+    return res.sendStatus(200);
   } catch (err) {
     return res.status(500).send(err.message);
   }
