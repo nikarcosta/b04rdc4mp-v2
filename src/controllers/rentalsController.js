@@ -7,6 +7,7 @@ import {
   updateRentalsReturnDateRepository,
   updateRentalsDelayFeeRepository,
   getRentalsById,
+  deleteRentalsRepository,
 } from "../repositories/rentalsRepository.js";
 
 export async function getRentals(_, res) {
@@ -81,6 +82,24 @@ export async function updateRentals(req, res) {
       await updateRentalsDelayFeeRepository(delayFee, id);
       return res.sendStatus(200);
     }
+
+    return res.sendStatus(200);
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+}
+
+export async function deleteRentals(req, res) {
+  const { id } = req.params;
+
+  try {
+    const rentalExist = await getRentalsById(id);
+
+    if (rentalExist.rowCount === 0) return res.sendStatus(404);
+
+    if (rentalExist.rows[0].returnDate != null) return res.sendStatus(400);
+
+    await deleteRentalsRepository(id);
 
     return res.sendStatus(200);
   } catch (err) {

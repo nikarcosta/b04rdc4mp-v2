@@ -58,3 +58,7 @@ export async function updateRentalsDelayFeeRepository(delayFee, id) {
     id,
   ]);
 }
+
+export async function deleteRentalsRepository(id) {
+  return await db.query(`DELETE FROM rentals WHERE id = $1`, [id]);
+}
