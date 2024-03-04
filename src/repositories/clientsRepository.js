@@ -26,3 +26,7 @@ export async function updateClientsRepository(name, phone, cpf, birthday, id) {
     [name, phone, cpf, birthday, id]
   );
 }
+
+export async function getClientsByQueryStringRepository(string) {
+  return db.query(`SELECT * FROM customers WHERE cpf LIKE $1`, [`${string}%`]);
+}

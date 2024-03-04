@@ -4,6 +4,7 @@ import {
   getClientsRepository,
   getClientsByIdRepository,
   updateClientsRepository,
+  getClientsByQueryStringRepository,
 } from "../repositories/clientsRepository.js";
 
 export async function postClients(req, res) {
@@ -22,13 +23,23 @@ export async function postClients(req, res) {
   }
 }
 
-export async function getClients(_, res) {
+export async function getClients(req, res) {
+  const { cpf } = req.query;
+
   try {
-    const clients = await getClientsRepository();
+    if (!cpf) {
+      const clients = await getClientsRepository();
 
-    const formattedClients = formatDate(clients.rows);
+      const formattedClients = formatDate(clients.rows);
 
-    return res.status(200).send(formattedClients);
+      return res.status(200).send(formattedClients);
+    }
+
+    const clientsByQueryString = await getClientsByQueryStringRepository(cpf);
+
+    if (clientsByQueryString.rowCount === 0) return res.sendStatus(404);
+
+    return res.status(200).send(clientsByQueryString.rows);
   } catch (err) {
     return res.status(500).send(err.message);
   }
