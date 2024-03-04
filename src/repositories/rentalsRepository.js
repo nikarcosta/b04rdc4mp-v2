@@ -62,3 +62,9 @@ export async function updateRentalsDelayFeeRepository(delayFee, id) {
 export async function deleteRentalsRepository(id) {
   return await db.query(`DELETE FROM rentals WHERE id = $1`, [id]);
 }
+
+export async function getClientsByQueryString(string) {
+  return await db.query(`SELECT * FROM customers WHERE cpf LIKE $1`, [
+    `${string}%`,
+  ]);
+}
