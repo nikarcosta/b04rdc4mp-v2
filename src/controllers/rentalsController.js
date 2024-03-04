@@ -8,25 +8,15 @@ import {
   updateRentalsDelayFeeRepository,
   getRentalsById,
   deleteRentalsRepository,
-  getClientsByQueryString,
 } from "../repositories/rentalsRepository.js";
 
-export async function getRentals(req, res) {
-  const { cpf } = req.query;
+export async function getRentals(_, res) {
   try {
-    if (!cpf) {
-      const rentals = await getRentalsRepository();
+    const rentals = await getRentalsRepository();
 
-      if (rentals.rowCount === 0) return res.sendStatus(404);
+    if (rentals.rowCount === 0) return res.sendStatus(404);
 
-      return res.status(200).send(rentals.rows);
-    }
-
-    const rentalsByQueryString = await getClientsByQueryString(cpf);
-
-    if (rentalsByQueryString.rowCount === 0) return res.sendStatus(404);
-
-    return res.status(200).send(rentalsByQueryString.rows);
+    return res.status(200).send(rentals.rows);
   } catch (err) {
     return res.status(500).send(err.message);
   }
