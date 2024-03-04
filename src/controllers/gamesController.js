@@ -2,13 +2,21 @@ import {
   getGamesRepository,
   findGamesRepository,
   postGamesRepository,
+  findGamesByQueryString,
 } from "../repositories/gamesRepository.js";
 
-export async function getGames(_, res) {
+export async function getGames(req, res) {
+  const { name } = req.query;
   try {
-    const games = await getGamesRepository();
-    if (games.rowCount === 0) return res.sendStatus(404);
-    return res.status(201).send(games.rows);
+    if (!name) {
+      const games = await getGamesRepository();
+      if (games.rowCount === 0) return res.sendStatus(404);
+      return res.status(200).send(games.rows);
+    }
+
+    const gamesByQueryString = await findGamesByQueryString(name);
+    if (gamesByQueryString.rowCount === 0) return res.sendStatus(404);
+    return res.status(200).send(gamesByQueryString.rows);
   } catch (err) {
     return res.status(500).send(err.message);
   }

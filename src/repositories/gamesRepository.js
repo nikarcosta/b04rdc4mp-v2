@@ -24,3 +24,7 @@ export async function postGamesRepository(
 export async function findGamesByIdRepository(id) {
   return db.query(`SELECT * FROM games WHERE id=$1`, [id]);
 }
+
+export async function findGamesByQueryString(string) {
+  return db.query(`SELECT * FROM games WHERE name ILIKE $1`, [`${string}%`]);
+}
