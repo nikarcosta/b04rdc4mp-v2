@@ -8,15 +8,28 @@ import {
   updateRentalsDelayFeeRepository,
   getRentalsById,
   deleteRentalsRepository,
+  getRentalsByQueryStringRepository,
 } from "../repositories/rentalsRepository.js";
 
-export async function getRentals(_, res) {
+export async function getRentals(req, res) {
+  const { customerId } = req.query;
+
   try {
-    const rentals = await getRentalsRepository();
+    if (!customerId) {
+      const rentals = await getRentalsRepository();
 
-    if (rentals.rowCount === 0) return res.sendStatus(404);
+      if (rentals.rowCount === 0) return res.sendStatus(404);
 
-    return res.status(200).send(rentals.rows);
+      return res.status(200).send(rentals.rows);
+    }
+
+    const rentalsByQueryString = await getRentalsByQueryStringRepository(
+      parseInt(customerId)
+    );
+
+    if (rentalsByQueryString.rowCount === 0) return res.sendStatus(404);
+
+    return res.status(200).send(rentalsByQueryString.rows);
   } catch (err) {
     return res.status(500).send(err.message);
   }
