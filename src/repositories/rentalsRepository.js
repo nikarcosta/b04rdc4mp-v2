@@ -63,7 +63,7 @@ export async function deleteRentalsRepository(id) {
   return await db.query(`DELETE FROM rentals WHERE id = $1`, [id]);
 }
 
-export async function getRentalsByQueryStringRepository(customerId) {
+export async function getRentalsByQueryStringCustomerIdRepository(customerId) {
   return await db.query(
     `SELECT 
       rentals.id AS id,
@@ -81,5 +81,30 @@ export async function getRentalsByQueryStringRepository(customerId) {
     JOIN games ON games.id = rentals."gameId"
     WHERE "customerId" = $1`,
     [customerId]
+  );
+}
+
+export async function getRentalsByQueryStringGameIdRepository(gameId) {
+  return await db.query(
+    `SELECT
+    rentals.id AS id,
+    rentals."customerId" AS customerId,
+    rentals."gameId" AS gameId,
+    to_char(rentals."rentDate", 'YYYY-MM-DD') AS rentDate,
+    rentals."daysRented" AS daysRented,
+    to_char(rentals."returnDate", 'YYYY-MM-DD') AS returnDate,
+    rentals."originalPrice" AS originalPrice,
+    rentals."delayFee" AS delayFee,
+    json_build_object('id', customers.id, 'name', customers.name) AS customer,
+    json_build_object('id', games.id, 'name', games.name) AS game
+    FROM
+      rentals
+    JOIN
+      customers ON customers.id = rentals."customerId"
+    JOIN
+      games ON games.id = rentals."gameId"
+    WHERE
+      rentals."gameId" = $1;`,
+    [gameId]
   );
 }

@@ -8,14 +8,14 @@ import {
   updateRentalsDelayFeeRepository,
   getRentalsById,
   deleteRentalsRepository,
-  getRentalsByQueryStringRepository,
+  getRentalsByQueryStringCustomerIdRepository,
 } from "../repositories/rentalsRepository.js";
 
 export async function getRentals(req, res) {
-  const { customerId } = req.query;
+  const { customerId, gameId } = req.query;
 
   try {
-    if (!customerId) {
+    if (!customerId && !gameId) {
       const rentals = await getRentalsRepository();
 
       if (rentals.rowCount === 0) return res.sendStatus(404);
@@ -23,13 +23,30 @@ export async function getRentals(req, res) {
       return res.status(200).send(rentals.rows);
     }
 
-    const rentalsByQueryString = await getRentalsByQueryStringRepository(
-      parseInt(customerId)
-    );
+    if (customerId && gameId) {
+      return res
+        .status(400)
+        .send("Provide either customerId or gameId, not both.");
+    }
 
-    if (rentalsByQueryString.rowCount === 0) return res.sendStatus(404);
+    if (customerId) {
+      const rentalsByCustomerId =
+        await getRentalsByQueryStringCustomerIdRepository(parseInt(customerId));
 
-    return res.status(200).send(rentalsByQueryString.rows);
+      if (rentalsByCustomerId.rowCount === 0) return res.sendStatus(404);
+
+      return res.status(200).send(rentalsByCustomerId.rows);
+    }
+
+    if (gameId) {
+      const rentalsByGameId = await getRentalsByGameIdRepository(
+        parseInt(gameId)
+      );
+
+      if (rentalsByGameId.rowCount === 0) return res.sendStatus(404);
+
+      return res.status(200).send(rentalsByGameId.rows);
+    }
   } catch (err) {
     return res.status(500).send(err.message);
   }
@@ -118,4 +135,27 @@ export async function deleteRentals(req, res) {
   } catch (err) {
     return res.status(500).send(err.message);
   }
+}
+
+function formatResult(result) {
+  const formattedResult = result.rows.map((row) => ({
+    id: row.id,
+    customerId: row.customerId,
+    gameId: row.gameId,
+    rentDate: row.rentDate,
+    daysRented: row.daysRented,
+    returnDate: row.returnDate,
+    originalPrice: row.originalPrice,
+    delayFee: row.delayFee,
+    customer: {
+      id: row.customer_id,
+      name: row.customer_name,
+    },
+    game: {
+      id: row.game_id,
+      name: row.game_name,
+    },
+  }));
+
+  return formattedResult;
 }
